@@ -1,0 +1,4 @@
+[submodule "golem-js"]
+	path = golem-js
+	url = git@github.com:golemfactory/golem-js.git
+	branch = feature/JST-497/integrating-golem-with-fullstack-apps

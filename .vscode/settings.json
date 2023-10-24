@@ -1,0 +1,5 @@
+{
+  "cSpell.words": ["TRPC"],
+  "python.analysis.typeCheckingMode": "off",
+  "prettier.prettierPath": "./node_modules/prettier"
+}
