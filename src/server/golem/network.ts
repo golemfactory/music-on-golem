@@ -20,18 +20,28 @@ const verifiedProviders = (
 const whiteList = ProposalFilters.whiteListProposalIdsFilter(verifiedProviders);
 
 const golem = new GolemNetwork({
-  yagnaOptions: {
+  yagna: {
     apiKey: env.YAGNA_APPKEY,
   },
-  taskTimeout: 1000 * 60 * 60,
-  activityExecuteTimeout: 1000 * 60 * 60,
-  activityPreparingTimeout: 1000 * 60 * 2,
-  proposalFilter: async (proposal) =>
-    (await acceptablePrice(proposal)) && (await whiteList(proposal)),
-  payment: {
-    network: "polygon",
+  activity: {
+    activityExecuteTimeout: 1000 * 60 * 60,
   },
-  enableLogging: false,
+
+  work: {
+    activityPreparingTimeout: 1000 * 60 * 2,
+  },
+
+  market: {
+    proposalFilter: async (proposal) =>
+      (await acceptablePrice(proposal)) && (await whiteList(proposal)),
+  },
+  payment: {
+    payment: {
+      network: "polygon",
+    },
+  },
 });
+
+await golem.init();
 
 export { golem };

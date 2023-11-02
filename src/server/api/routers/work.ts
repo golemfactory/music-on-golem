@@ -2,7 +2,7 @@ import { workTable } from "~/server/db/schema";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { cancelWork, runOnGolem } from "~/server/golem/runOnGolem";
+import { cancelWork, runOnGolem } from "~/server/golem/golemService";
 
 export const workRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
