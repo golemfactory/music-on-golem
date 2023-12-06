@@ -1,47 +1,46 @@
 import { workTable } from "~/server/db/schema";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { cancelWork, runOnGolem } from "~/server/golem/golemService";
+import { TRPCError } from "@trpc/server";
 
 export const workRouter = createTRPCRouter({
-  getAll: publicProcedure.query(({ ctx }) => {
-    if (!ctx.user) throw new Error("Not logged in");
+  getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db
       .select()
       .from(workTable)
       .where(eq(workTable.owner, ctx.user))
       .orderBy(workTable.createdAt);
   }),
-  get: publicProcedure
+  get: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(({ input, ctx }) => {
-      if (!ctx.user) throw new Error("Not logged in");
       return ctx.db
         .select()
         .from(workTable)
         .where(eq(workTable.id, input.id))
         .where(eq(workTable.owner, ctx.user));
     }),
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({ prompt: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      if (!ctx.user) throw new Error("Not logged in");
+    .mutation(({ input, ctx }) => {
       try {
-        const workId = await runOnGolem({
+        const work = runOnGolem({
           prompt: input.prompt,
           owner: ctx.user,
         });
-        return workId;
+        return work;
       } catch (e) {
-        console.error(e);
-        throw new Error("Failed to create work");
+        throw new TRPCError({
+          message: "Failed to create work",
+          code: "INTERNAL_SERVER_ERROR",
+        });
       }
     }),
-  cancel: publicProcedure
+  cancel: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ input, ctx }) => {
-      if (!ctx.user) throw new Error("Not logged in");
       try {
         const [work] = await ctx.db
           .select()
@@ -49,12 +48,19 @@ export const workRouter = createTRPCRouter({
           .where(eq(workTable.id, input.id))
           .where(eq(workTable.owner, ctx.user))
           .limit(1);
-        if (!work) throw new Error("Work not found");
+        if (!work) {
+          throw new TRPCError({
+            message: "Work not found",
+            code: "NOT_FOUND",
+          });
+        }
         await cancelWork(input.id);
         return true;
       } catch (e) {
-        console.error(e);
-        throw new Error("Failed to cancel work");
+        throw new TRPCError({
+          message: "Failed to cancel work",
+          code: "INTERNAL_SERVER_ERROR",
+        });
       }
     }),
 });

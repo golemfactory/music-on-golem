@@ -8,7 +8,6 @@ export function createContext({ req }: CreateNextContextOptions) {
   // Create your context based on the request object
   // Will be available as `ctx` in all your resolvers
 
-  // This is just an example of something you might want to do in your ctx fn
   function getUserFromHeader() {
     if (req.headers.authorization) {
       const token = req.headers.authorization.split(" ")[1];

@@ -7,17 +7,11 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { Button } from "~/@/components/ui/button";
 import { api, tokenAtom } from "~/utils/api";
 
-export function ConnectButton({
-  onStateChange,
-}: {
-  onStateChange?: () => void;
-}) {
+export function ConnectButton() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [token, setToken] = useAtom(tokenAtom);
-  const login = api.example.login.useMutation();
-  const nonce = api.example.nonce.useQuery(undefined, {
-    enabled: false,
-  });
+  const login = api.auth.login.useMutation();
+  const nonce = api.auth.nonce.useMutation();
   const { connectAsync, connectors } = useConnect({
     connector: new InjectedConnector({
       chains: [polygon],
@@ -31,7 +25,7 @@ export function ConnectButton({
     try {
       setIsConnecting(true);
       const { account } = await connectAsync({ connector: connectors[0]! });
-      const nonceResponse = await nonce.refetch();
+      const nonceResponse = await nonce.mutateAsync();
       const message = new SiweMessage({
         domain: window.location.host,
         address: account,
@@ -39,23 +33,22 @@ export function ConnectButton({
         uri: window.location.origin,
         version: "1",
         chainId: polygon.id,
-        nonce: nonceResponse.data?.nonce,
+        nonce: nonceResponse.nonce,
       });
       const messageHash = message.prepareMessage();
       const signature = await signMessageAsync({
         message: messageHash,
       });
-      const token = await login.mutateAsync({
+      const { jwt } = await login.mutateAsync({
         message: messageHash,
         signature,
       });
-      setToken(token.jwt);
+      setToken(jwt);
     } catch (error) {
       disconnect();
       console.error(error);
     } finally {
       setIsConnecting(false);
-      onStateChange?.();
     }
   };
 
@@ -69,7 +62,6 @@ export function ConnectButton({
         onClick={() => {
           disconnect();
           setToken("");
-          onStateChange?.();
         }}
       >
         Disconnect
@@ -79,8 +71,7 @@ export function ConnectButton({
 
   return (
     <Button
-      onClick={(e) => {
-        e.preventDefault();
+      onClick={() => {
         void handleLogin();
       }}
     >

@@ -7,18 +7,13 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z
-      .string()
-      .url()
-      .refine(
-        (str) => !str.includes("YOUR_POSTGRES_URL_HERE"),
-        "You forgot to change the default URL",
-      ),
+    DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
     JWT_SECRET: z.string().min(32),
     YAGNA_APPKEY: z.string(),
+    NETWORK: z.enum(["polygon", "goerli"]),
   },
 
   /**
@@ -39,6 +34,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     JWT_SECRET: process.env.JWT_SECRET,
     YAGNA_APPKEY: process.env.YAGNA_APPKEY,
+    NETWORK: process.env.NETWORK,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
