@@ -2,7 +2,7 @@ import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
-import { cn } from "src/@/lib/utils";
+import { cn } from "~/design-system/utils";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -32,7 +32,7 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay className="dark" />
+    <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

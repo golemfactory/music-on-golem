@@ -4,7 +4,7 @@ import { SiweMessage } from "siwe";
 import { polygon } from "viem/chains";
 import { useConnect, useDisconnect, useSignMessage, useAccount } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import { Button } from "~/@/components/ui/button";
+import { Button } from "~/design-system/components/ui/button";
 import { api, tokenAtom } from "~/utils/api";
 
 export function ConnectButton() {
