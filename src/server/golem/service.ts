@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { snippetTable } from "../db/schema";
-import { golemClient } from "./network";
+import { golemClient } from "./client";
 
 export function startWork({
   prompt,

@@ -2,7 +2,7 @@ import { snippetTable } from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { cancelWork, startWork } from "~/server/golem/golemService";
+import { cancelWork, startWork } from "~/server/golem/service";
 import { TRPCError } from "@trpc/server";
 
 export const snippetRouter = createTRPCRouter({
