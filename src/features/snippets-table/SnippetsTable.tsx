@@ -16,11 +16,12 @@ import {
 import { Button } from "~/design-system/components/ui/button";
 import { useToast } from "~/design-system/components/ui/use-toast";
 
-export function CreationsTable() {
-  const { data: works } = api.work.getAll.useQuery(undefined, {
+export function SnippetsTable() {
+  const { data: works } = api.snippet.getAll.useQuery(undefined, {
     refetchInterval: 1000,
   });
-  const { mutateAsync } = api.work.cancel.useMutation();
+  const { mutateAsync, status: cancelMutationStatus } =
+    api.snippet.cancel.useMutation();
   const { toast } = useToast();
   async function cancelWork(id: string) {
     try {
@@ -39,12 +40,21 @@ export function CreationsTable() {
     }
   }
 
+  if (!works?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4">
+        <h1 className="text-4xl font-semibold">No snippets yet</h1>
+        <p className="text-xl">Create a new snippet to get started.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 gap-4 2xl:grid-cols-3">
       {works?.map((work) => (
         <Card
           key={work.id}
-          className="flex max-w-[500px] flex-col justify-between"
+          className="flex max-h-64 w-[500] flex-col justify-between"
         >
           <CardHeader>
             <CardTitle>
@@ -103,8 +113,9 @@ export function CreationsTable() {
               <Button
                 variant="destructive"
                 onClick={() => void cancelWork(work.id)}
+                disabled={cancelMutationStatus === "loading"}
               >
-                Cancel
+                {cancelMutationStatus === "loading" ? "Canceling..." : "Cancel"}
               </Button>
             )}
           </CardFooter>

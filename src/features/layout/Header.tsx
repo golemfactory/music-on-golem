@@ -1,4 +1,4 @@
-import { ConnectButton } from "~/features/auth/components/ConnectButton";
+import { ConnectButton } from "~/features/auth/ConnectButton";
 import Navigation from "./Navigation";
 
 export default function Header() {

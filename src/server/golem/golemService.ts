@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { workTable } from "../db/schema";
+import { snippetTable } from "../db/schema";
 import { golemClient } from "./network";
 
-export function runOnGolem({
+export function startWork({
   prompt,
   owner,
 }: {
@@ -21,7 +21,7 @@ export function runOnGolem({
 
   job.events.on("created", () => {
     console.log("Job", job.id, "created");
-    db.insert(workTable)
+    db.insert(snippetTable)
       .values({
         id: job.id,
         status: "waiting",
@@ -32,23 +32,23 @@ export function runOnGolem({
   });
   job.events.on("started", () => {
     console.log("Job", job.id, "started");
-    db.update(workTable)
+    db.update(snippetTable)
       .set({ status: "in_progress" })
-      .where(eq(workTable.id, job.id))
+      .where(eq(snippetTable.id, job.id))
       .catch(console.error);
   });
   job.events.on("success", () => {
     console.log("Job", job.id, "success", job.results);
-    db.update(workTable)
+    db.update(snippetTable)
       .set({ status: "done" })
-      .where(eq(workTable.id, job.id))
+      .where(eq(snippetTable.id, job.id))
       .catch(console.error);
   });
   job.events.on("error", () => {
     console.log("Job", job.id, "error", job.error);
-    db.update(workTable)
+    db.update(snippetTable)
       .set({ status: "error" })
-      .where(eq(workTable.id, job.id))
+      .where(eq(snippetTable.id, job.id))
       .catch(console.error);
   });
 

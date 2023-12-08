@@ -1,8 +1,8 @@
 import { useAtomValue } from "jotai";
-import { CreationsTable } from "~/features/creations-table/components/CreationsTable";
+import { SnippetsTable } from "~/features/snippets-table/SnippetsTable";
 import { tokenAtom } from "~/utils/api";
 
-export default function MyCreations() {
+export default function MySnippets() {
   const isConnected = Boolean(useAtomValue(tokenAtom));
   if (!isConnected)
     return (
@@ -16,7 +16,7 @@ export default function MyCreations() {
 
   return (
     <div className="flex h-full w-full justify-center overflow-y-auto pt-16">
-      <CreationsTable />
+      <SnippetsTable />
     </div>
   );
 }

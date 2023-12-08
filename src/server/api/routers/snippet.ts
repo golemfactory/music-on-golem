@@ -1,39 +1,39 @@
-import { workTable } from "~/server/db/schema";
+import { snippetTable } from "~/server/db/schema";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { cancelWork, runOnGolem } from "~/server/golem/golemService";
+import { cancelWork, startWork } from "~/server/golem/golemService";
 import { TRPCError } from "@trpc/server";
 
-export const workRouter = createTRPCRouter({
+export const snippetRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db
       .select()
-      .from(workTable)
-      .where(eq(workTable.owner, ctx.user))
-      .orderBy(workTable.createdAt);
+      .from(snippetTable)
+      .where(eq(snippetTable.owner, ctx.user))
+      .orderBy(snippetTable.createdAt);
   }),
   get: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(({ input, ctx }) => {
       return ctx.db
         .select()
-        .from(workTable)
-        .where(eq(workTable.id, input.id))
-        .where(eq(workTable.owner, ctx.user));
+        .from(snippetTable)
+        .where(eq(snippetTable.id, input.id))
+        .where(eq(snippetTable.owner, ctx.user));
     }),
   create: protectedProcedure
     .input(z.object({ prompt: z.string() }))
     .mutation(({ input, ctx }) => {
       try {
-        const work = runOnGolem({
+        const createdJob = startWork({
           prompt: input.prompt,
           owner: ctx.user,
         });
-        return work;
+        return createdJob;
       } catch (e) {
         throw new TRPCError({
-          message: "Failed to create work",
+          message: "Failed to start work on the Golem network",
           code: "INTERNAL_SERVER_ERROR",
         });
       }
@@ -42,15 +42,15 @@ export const workRouter = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        const [work] = await ctx.db
+        const [snippet] = await ctx.db
           .select()
-          .from(workTable)
-          .where(eq(workTable.id, input.id))
-          .where(eq(workTable.owner, ctx.user))
+          .from(snippetTable)
+          .where(eq(snippetTable.id, input.id))
+          .where(eq(snippetTable.owner, ctx.user))
           .limit(1);
-        if (!work) {
+        if (!snippet) {
           throw new TRPCError({
-            message: "Work not found",
+            message: "Snippet not found",
             code: "NOT_FOUND",
           });
         }

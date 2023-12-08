@@ -9,5 +9,5 @@ export default {
     connectionString: env.DATABASE_URL,
   },
   out: "./drizzle",
-  tablesFilter: ["fullstack-golem-POC_*"],
+  tablesFilter: ["music-on-golem_*"],
 } satisfies Config;

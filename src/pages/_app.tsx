@@ -7,7 +7,7 @@ import "@fontsource/kanit/600.css"; // semi-bold
 import "~/styles/globals.css";
 import { polygon } from "viem/chains";
 import { Provider } from "jotai";
-import RootLayout from "~/features/layout/components/RootLayout";
+import RootLayout from "~/features/layout/RootLayout";
 import { Toaster } from "~/design-system/components/ui/toaster";
 
 const config = createConfig({

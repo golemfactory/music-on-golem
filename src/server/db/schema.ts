@@ -12,19 +12,19 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const pgTable = pgTableCreator((name) => `fullstack-golem-POC_${name}`);
+export const pgTable = pgTableCreator((name) => `music_on_golem_${name}`);
 
-export const workStatus = pgEnum("work_status", [
+export const snippetStatus = pgEnum("snippet_status", [
   "waiting",
   "in_progress",
   "error",
   "done",
 ]);
 
-export const workTable = pgTable("work", {
+export const snippetTable = pgTable("snippet", {
   id: uuid("id").primaryKey().defaultRandom(),
   owner: text("owner").notNull(),
   prompt: text("prompt").notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
-  status: workStatus("status").notNull(),
+  status: snippetStatus("status").notNull(),
 });
