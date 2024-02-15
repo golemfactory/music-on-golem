@@ -17,7 +17,7 @@ The project was set up with the help of [create-t3-app](https://create.t3.gg/).
 
 ## How does Golem fit into all of this?
 
-One of the goals of this experiment was to use the new [Job](https://docs.golem.network/docs/creators/javascript/guides/retrievable-tasks) API of the Golem JavaScript SDK. This API allows us to order some work on the Golem Network and easily retrieve the status and results later on as well as to cancel the work if needed. It also makes it trivial to react to events that happen during the work's lifecycle - in this case, we're using it to update the status in the database.
+One of the goals of this experiment was to use the new **experimental** [Job](https://docs.golem.network/docs/creators/javascript/guides/retrievable-tasks) API of the Golem JavaScript SDK. This API allows us to order some work on the Golem Network and easily retrieve the status and results later on as well as to cancel the work if needed. It also makes it trivial to react to events that happen during the work's lifecycle - in this case, we're using it to update the status in the database.
 
 ## Local setup
 
