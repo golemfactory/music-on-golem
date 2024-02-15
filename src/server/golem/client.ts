@@ -30,22 +30,16 @@ declare namespace globalThis {
   let golemClient: GolemNetwork | undefined;
 }
 
-let golemClient: GolemNetwork;
 /**
- * During development, we want to close the client when the dev server restarts,
- * so let's store it in the global object.
- * https://github.com/vercel/next.js/discussions/26427
+ * We want to initialize the Golem client once and then reuse it across the server.
  */
-if (process.env.NODE_ENV === "development") {
+async function getClient() {
   if (globalThis.golemClient) {
-    console.log("Closing existing Golem client");
-    await globalThis.golemClient.close().catch(console.error);
+    return globalThis.golemClient;
   }
   globalThis.golemClient = await getGolemClient();
-  golemClient = globalThis.golemClient;
-} else {
-  // in production, we don't need to persist the client
-  golemClient = await getGolemClient();
+  return globalThis.golemClient;
 }
 
+const golemClient = await getClient();
 export { golemClient };

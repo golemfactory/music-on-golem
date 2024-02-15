@@ -54,7 +54,7 @@ export function SnippetsTable() {
       {works?.map((work) => (
         <Card
           key={work.id}
-          className="flex max-h-64 w-[500] flex-col justify-between"
+          className="flex max-h-64 w-[500px] flex-col justify-between"
         >
           <CardHeader>
             <CardTitle>
@@ -100,7 +100,7 @@ export function SnippetsTable() {
                 in_progress: "The work is being processed by a provider...",
                 done: "The work has been completed successfully!",
                 error:
-                  "Something went wrong while processing the, please try again later.",
+                  "Something went wrong while processing the snippet, please try again later.",
               }[work.status] || "Unknown status"}
             </p>
           </CardContent>
