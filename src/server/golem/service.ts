@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { snippetTable } from "../db/schema";
-import { golemClient } from "./client";
+import { jobManager } from "./client";
+import type { MarketOrderSpec } from "@golem-sdk/golem-js";
 
 export function startWork({
   prompt,
@@ -10,15 +11,26 @@ export function startWork({
   prompt: string;
   owner: string;
 }) {
-  const job = golemClient.createJob<string>({
-    package: {
-      imageTag: "severyn/musicgen:lite",
-      minStorageGib: 8,
-      minCpuCores: 4,
-      minMemGib: 8,
+  const order: MarketOrderSpec = {
+    demand: {
+      workload: {
+        imageTag: "severyn/musicgen:lite",
+        minStorageGib: 8,
+        minCpuCores: 4,
+        minMemGib: 8,
+      }
     },
-  });
-
+    market: {
+      rentHours: 0.5,
+      pricing: {
+        model: "linear",
+        maxStartPrice: 1,
+        maxCpuPerHourPrice: 1,
+        maxEnvPerHourPrice: 1,
+      },
+    },
+  }
+  const job = jobManager.createJob<string>(order);
   job.events.on("created", () => {
     console.log("Job", job.id, "created");
     db.insert(snippetTable)
@@ -51,10 +63,9 @@ export function startWork({
       .where(eq(snippetTable.id, job.id))
       .catch(console.error);
   });
-
-  job.startWork(async (ctx) => {
-    await ctx.run(`python run.py --prompt "${prompt}" --duration 15`);
-    await ctx.downloadFile("/golem/output/out.wav", `public/${job.id}.wav`);
+  job.startWork(async (exe) => {
+    await exe.run(`python run.py --prompt "${prompt}" --duration 15`);
+    await exe.downloadFile("/golem/output/out.wav", `public/${job.id}.wav`);
     return `public/${job.id}.wav`;
   });
 
@@ -67,7 +78,7 @@ export function startWork({
 }
 
 export async function cancelWork(id: string) {
-  const job = golemClient.getJobById(id);
+  const job = jobManager.getJobById(id);
   if (!job) {
     throw new Error("Job not found");
   }
