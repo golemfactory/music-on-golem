@@ -13,7 +13,7 @@ export const env = createEnv({
       .default("development"),
     JWT_SECRET: z.string().min(32),
     YAGNA_APPKEY: z.string(),
-    NETWORK: z.enum(["polygon", "goerli"]),
+    NETWORK: z.enum(["polygon", "holesky"]),
   },
 
   /**

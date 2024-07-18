@@ -1,45 +1,38 @@
-import { GolemNetwork } from "@golem-sdk/golem-js";
+import { JobManager } from "@golem-sdk/golem-js/experimental";
 import { env } from "~/env.mjs";
 
-async function getGolemClient() {
-  const client = new GolemNetwork({
+
+async function getJobManager() {
+  const jobManager = new JobManager({
     yagna: {
       apiKey: env.YAGNA_APPKEY,
     },
-    activity: {
-      activityExecuteTimeout: 1000 * 60 * 60,
-    },
-    work: {
-      activityPreparingTimeout: 1000 * 60 * 5,
-    },
     payment: {
-      payment: {
-        network: env.NETWORK,
-      },
+      network: env.NETWORK,
     },
   });
-  await client.init().then(
+  await jobManager.init().then(
     () => console.log("Golem client initialized"),
     (err) => console.error("Golem client failed to initialize", err),
   );
-  return client;
+  return jobManager;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace globalThis {
-  let golemClient: GolemNetwork | undefined;
+  let jobManager: JobManager | undefined;
 }
 
 /**
- * We want to initialize the Golem client once and then reuse it across the server.
+ * We want to initialize the Golem Job Manager once and then reuse it across the server.
  */
-async function getClient() {
-  if (globalThis.golemClient) {
-    return globalThis.golemClient;
+async function getManager() {
+  if (globalThis.jobManager) {
+    return globalThis.jobManager;
   }
-  globalThis.golemClient = await getGolemClient();
-  return globalThis.golemClient;
+  globalThis.jobManager = await getJobManager();
+  return globalThis.jobManager;
 }
 
-const golemClient = await getClient();
-export { golemClient };
+const jobManager = await getManager();
+export { jobManager };
